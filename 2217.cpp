@@ -4,24 +4,18 @@
 using namespace std;
 
 int main() {
+    int N, w, ans = 0;
     vector<int> ropes;
-    int N, num, ans;
-    
     cin >> N;
     
     for(int i = 0; i < N; i++) {
-        cin >> num;
-        ropes.push_back(num);
+        cin >> w;
+        ropes.push_back(w);
     }
     
     sort(ropes.begin(), ropes.end());
     
-    ans = 0;
-    for(int i = 0; i < N; i++) {
+    for(int i = 0; i < N; i++)
         ans = max(ans, ropes[i] * (N - i));
-    }
-    
     cout << ans;
-    
-    return 0;
 }
