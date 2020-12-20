@@ -1,23 +1,22 @@
 numGames, numWins = map(int, input().split(' '))
 
-z = int(numWins / numGames * 100)
+z = int(numWins * 100 / numGames)
 
 l, r = 0, 1000000000
 
-while l < r:
+while l <= r:
     mid = (l + r) // 2
     newZ = int((numWins + mid) * 100 / (numGames + mid))
     
-    if z < newZ:
-        r = mid
+    if newZ > z:
+        r = mid - 1
     else:
         l = mid + 1
-    print(l, mid, r, z, newZ)
     
 if z >= 99:
     print(-1)
 else:
-    print(mid)
+    print(l)
     
     
     

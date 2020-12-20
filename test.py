@@ -1,23 +1,29 @@
-def solution(k, room_number):
-    answer = []
-    
-    delta = [0 for i in range(k + 1)]
-    print(len(delta))
-    for num in room_number:
-        if not delta[num]:
-            answer += [num]
-            delta[num] = 1
-        else:
-            for i in range(delta[num], k):
-                nextRoom = num + i
-                if not delta[nextRoom]:
-                    answer += [nextRoom]
-                    delta[nextRoom] = 1
-                    delta[num] += i
-        
-    return answer
-    
-k = int(input())
-room_number = list(input())
+N = int(input())
+state = False
+elements = list(map(str, range(10)))
 
-print(solution(k, room_number))
+nums = [[], [], [], [], [], [], [], [], [], []]
+
+if N < 1024:
+    for i in range(1, 1 << 10):
+        num = ""
+        cnt = 0
+        for j in range(10):
+            if (i & 1 << j):
+                num = elements[j] + num
+                cnt += 1
+            nums[cnt - 1].append(num)
+        cnt = 0
+        
+        for e in nums:
+            if state:
+                break
+            for n in e:
+                cnt += 1
+                if cnt == N:
+                    state = True
+                    print(n)
+                    break
+                
+else:
+    print(-1)
