@@ -1,0 +1,1 @@
+print([i for i in range(9**7) if'666'in f'{i}'][int(input())-1])
