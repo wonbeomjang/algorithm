@@ -1,25 +1,25 @@
-from collections import deque
-import copy
 import sys
+from collections import deque
 
-sys.setrecursionlimit(1000000000)
-
-drdc = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+input = lambda: sys.stdin.readline().strip()
+drdc = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 num_row, num_col = map(int, input().split())
 
-board = [list(map(int, input().split())) for _ in range(num_row)]
-prev_board = copy.deepcopy(board)
+board = [list(map(int, input().split())) for i in range(num_row)]
+    
+def check():
+    visited = [[0] * num_col for i in range(num_row)]
+    cnt = 0
+    
+    for i in range(num_row):
+        for j in range(num_col):
+            if board[i][j] == 1:
+                cnt += 1
+    return cnt
 
-def melt():
-    global num_row, num_col
-    global board
-    
-    visited = [[False] * num_col for _ in range(num_row)]
-    q = deque()
-    q.append([0, 0])
-    
-    visited[0][0] = True
+def bfs(q, visited):
+    res = deque()
     
     while q:
         row, col = q.popleft()
@@ -32,85 +32,59 @@ def melt():
                 continue
             
             if not visited[next_row][next_col]:
-                visited[next_row][next_col] = True
-                
-                if board[next_row][next_col] == 1:
-                    board[next_row][next_col] = 0
+                if not board[next_row][next_col]:
+                    q.append((next_row, next_col))
+                    visited[next_row][next_col] = True
+                    
                 else:
-                    q.append([next_row, next_col])
-                
-            
+                    visited[next_row][next_col] = True
+                    res.append((next_row, next_col))
+                    
+    return res
     
-
-def bfs(row, col, visited):
+def get_q_visited():
     global num_row, num_col
-    global prev_board
-    
-    q = deque()
-    q.append([row, col])
-    
-    visited[row][col] = True
-    cnt = 1
-    
-    while q:
-        row, col = q.popleft()
         
-        for dr, dc in drdc:
-            next_row = row + dr
-            next_col = col + dc
-            
-            if not (0 <= next_row < num_row and 0 <= next_col < num_col):
-                continue
-            
-            if not visited[next_row][next_col] and prev_board[next_row][next_col]:
-                q.append([next_row, next_col])
-                visited[next_row][next_col] = True
-                cnt += 1
-                
-    return cnt
-                
-
-def is_cheeze():
-    global num_row, num_col
-    global board
+    q = deque()
+    visited = [[0] * num_col for i in range(num_row)]
     
     for i in range(num_row):
-        for j in range(num_col):
-            if board[i][j] == 1:
-                return True
-                
-    return False
-
-def print_board():
-    global prev_board
+        visited[i][0] = True
+        visited[i][num_col - 1] = True
+        
+        q.append((i, 0))
+        q.append((i, num_col - 1))
+        
+    for i in range(num_col):
+        visited[0][i] = True
+        visited[num_row - 1][i] = True
+        
+        q.append((0, i))
+        q.append((num_row - 1, i))
     
-    for _ in range(num_col):
-        print('___', end='')
-    print()
-    for sb in prev_board:
-        for b in sb:
-            print(b, end=' ')
-        print()
+    return q, visited
 
-time = 0
 
-while True:
-    if not is_cheeze():
-        visited = [[False] * num_col for _ in range(num_row)]
-        
-        cnt = 0
-        for i in range(num_row):
-            for j in range(num_col):
-                if prev_board[i][j] and not visited[i][j]:
-                    res = bfs(i, j, visited)
-                    cnt += res
-        
-        print(time)
-        print(cnt)
-        
+chk = check()
+ans = 0
+cnt = 0
+
+while chk:
+    chk = check()
+    
+    if not chk:
         break
+    cnt += 1
+    ans = chk
     
-    visited = [[False] * num_col for _ in range(num_row)]
-    prev_board = copy.deepcopy(board)
-    melt()
-    time += 1
+    q, visited = get_q_visited()
+    res = bfs(q, visited)
+    
+    for i in range(len(res)):
+        row = res[i][0]
+        col = res[i][1]
+        
+        board[row][col] = 0
+    
+print(cnt)
+print(ans)

@@ -1,29 +1,25 @@
+import sys
 from collections import Counter
 
-def solve():
-    number = Counter(input())
-    
-    cnt = 0
-    center_latter = ''
-    for v in number:
-        if number[v] % 2:
-            cnt += 1
-            center_latter = v
-    
-    if cnt > 1:
-        print("I'm Sorry Hansoo")
-        return
-    
-    
-    alphabet = sorted(number.items())
-    
-    string = ''
-    
-    for a, num in alphabet:
-        string += a * (num // 2)
+input = lambda: sys.stdin.readline().strip()
+
+num = Counter(input())
+
+center = ''
+for n in num:
+    if num[n] % 2:
+        center += n
         
-    string = string + center_latter + string[::-1]
-    print(string)
+if len(center) > 1:
+    print("I'm Sorry Hansoo")
+    sys.exit(0)
     
+
+num = sorted(num.items())
+
+string = ''
+for a, n in num:
+    string += a * (n // 2)
+
+print(string + center + string[::-1])
     
-solve()

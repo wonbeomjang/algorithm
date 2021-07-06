@@ -1,17 +1,21 @@
-from sys import stdin
+import sys
 
-n, m = map(int, stdin.readline().split())
-rec = []
-for _ in range(n):
-    rec += [list(stdin.readline())]
-    
-res = 0
+input = lambda: sys.stdin.readline().strip()
 
-for i in range(n):
-    for j in range(m):
-        for k in range(min(m, n)):
-            if i + k < n and j + k < m and rec[i + k][j] == rec[i][j] and rec[i + k][j + k] == rec[i][j] and rec[i][j + k] == rec[i][j]:
-                res = max(res, (k + 1) * (k + 1))
+num_row, num_col = map(int, input().split())
+
+board = [list(input()) for i in range(num_row)]
+
+ans = 0
+
+for i in range(num_row):
+    for j in range(num_col):
+        for k in range(min(num_row, num_col)):
+            try:
+                if board[i][j] == board[i + k][j] == board[i][j + k] == board[i + k][j + k]:
+                    ans = max(ans, k + 1)
                 
-print(res)
-                
+            except:
+                pass
+            
+print(ans * ans)
