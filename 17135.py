@@ -1,72 +1,75 @@
+import copy
 import sys
 import heapq
-from copy import deepcopy
 from itertools import combinations
 
-input = lambda: sys.stdin.readline().strip()
 
-num_row, num_col, distance = map(int, input().split())
+input = lambda: sys.stdin.readline().strip()
+drdc = ((0, -1), (-1, 0), (0, 1))
+
+num_row, num_col, max_distance = map(int, input().split())
 board = [list(map(int, input().split())) for i in range(num_row)]
 
-def down(board):
+
+def print_board(board):
+    for line in board:
+        print(" ".join(map(str, line)))
+    print()
+
+
+def move(board):
     for i in range(num_row - 1, 0, -1):
         for j in range(num_col):
             board[i][j] = board[i - 1][j]
-            
+
     for j in range(num_col):
         board[0][j] = 0
 
-def get_distance(enamy, shooter):
-    return abs(enamy[0] - shooter[0]) + abs(enamy[1] - shooter[1])
 
-def shoot(board, positions, distance):
-    shooters = [[], [], []]
-    
-    for i in range(num_row - 1, -1, -1):
-        for j in range(num_col):
-            for s in range(3):
-                # (distance, col), row, col
-                if board[i][j]:
-                    heapq.heappush(shooters[s], ((get_distance(positions[s], (i, j)), j), i, j))
+def get_distance(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+
+def kill(board, shooter):
     cnt = 0
+    kill_info = [[], [], []]
 
-    for shooter in shooters:
-        if shooter:
-            (d, _), i, j = heapq.heappop(shooter)
-            if d <= distance and board[i][j]:
-                board[i][j] = 0
-                cnt += 1
-            
-    return cnt
-        
-
-def print_board(board):
-    print()
-    for subline in board:
-        print(' '.join(map(str, subline)))
-
-def play(board, positions, distance):
-    global num_row, num_col
-    
-    cnt = 0
     for i in range(num_row):
-        cnt += shoot(board, positions, distance)
-        down(board)
-        
+        for j in range(num_col):
+            if board[i][j] == 1:
+                for s in range(3):
+                    heapq.heappush(kill_info[s], ((get_distance(shooter[s], (i, j)), j), i, j))
+
+    for s in range(3):
+        if kill_info[s]:
+            (d, _), i, j = heapq.heappop(kill_info[s])
+
+            if d <= max_distance and board[i][j] == 1:
+                cnt += 1
+                board[i][j] = 0
+
     return cnt
 
-# positions = [(num_row, 0), (num_row, 2), (num_row, 4)]
 
-# shoot(board, positions, distance)
-# print_board(board)
+answer = 0
+temp = copy.deepcopy(board)
 
-ans = 0
 for p1, p2, p3 in combinations(range(num_col), 3):
-    positions = [(num_row, p1), (num_row, p2), (num_row, p3)]
-    result = play(deepcopy(board), positions, distance)
-    # print(p1, p2, p3, result)
-    ans = max(ans, result)
-    
-print(ans)
-    
-    
+    shooter = [(num_row, p1), (num_row, p2), (num_row, p3)]
+    cur_score = 0
+    board = copy.deepcopy(temp)
+    for i in range(num_row):
+        cur_score += kill(board, shooter)
+        move(board)
+    answer = max(answer, cur_score)
+
+# shooter = [(5, 0), (5, 1), (5, 3)]
+# cur_score = 0
+# for i in range(num_row):
+#     cur_score += kill(board, shooter)
+#     print_board(board)
+#     move(board)
+# print(cur_score)
+
+
+print(answer)

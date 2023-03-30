@@ -1,43 +1,42 @@
-from collections import deque
 import sys
-input = sys.stdin.readline
+from collections import deque
 
-def bfs():
-    q = deque()
-    q.append([a, ''])
-    
-    while q:
-        number, result = q.popleft()
-        
-        d = (2 * number) % 10000
-        if d == b: return result + 'D'
-        elif not visited[d]:
-            visited[d] = True
-            q.append([d, result + 'D'])
-        
-        s = number - 1 if number != 0 else 9999
-        if s == b: return result + 'S'
-        elif not visited[s]:
-            visited[s] = True
-            q.append([s, result + 'S'])
-        
-        l = int(number % 1000 * 10 + number / 1000)
-        if l == b: return result + 'L'
-        elif not visited[l]:
-            visited[l] = True
-            q.append([l, result + 'L'])
-        
-        r = int(number % 10 * 1000 + number // 10)
-        if r == b: return result + "R"
-        elif not visited[r]:
-            visited[r] = True
-            q.append([r, result + "R"])
-
+input = lambda: sys.stdin.readline().strip()
 
 num_test = int(input())
-for i in range(num_test):
-    a, b = map(int, input().split())
-    
-    visited = [False for _ in range(10000)]
-    print(bfs())
-    
+
+
+def bfs(num1, num2):
+    q = deque([(num1, "")])
+    visited = [False] * 10000
+
+    while q:
+        num, operation = q.popleft()
+
+        d = (2 * num) % 10000
+        if d == num2: return operation + "D"
+        if not visited[d]:
+            q.append((d, operation + "D"))
+            visited[d] = True
+
+        s = (num - 1) % 10000
+        if s == num2: return operation + "S"
+        if not visited[s]:
+            q.append((s, operation + "S"))
+            visited[s] = True
+
+        l = (num * 10) % 10000 + num // 1000
+        if l == num2: return operation + "L"
+        if not visited[l]:
+            q.append((l, operation + "L"))
+
+        r = num // 10 + (num % 10) * 1000
+        if r == num2: return operation + "R"
+        if not visited[r]:
+            q.append((r, operation + "R"))
+
+
+for _ in range(num_test):
+    num1, num2 = map(int, input().split())
+    print(bfs(num1, num2))
+

@@ -1,41 +1,42 @@
 import sys
 from collections import deque
 
+
+drdc = ((1, 0), (0, 1), (-1, 0), (0, -1))
 input = lambda: sys.stdin.readline().strip()
-drdc = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
-num_row, num_col, num_wall = map(int, input().split())
+num_rows, num_cols, can_break = map(int, input().split())
 
-board = [list(map(int, list(input()))) for i in range(num_row)]
-visited = [[[0] * (num_wall + 1) for i in range(num_col)] for i in range(num_row)]
+board = [list(map(int, list(input()))) for i in range(num_rows)]
 
-def bfs(visited):
-    q = deque()
-    q.append((0, 0, 0))
-    visited[0][0][0] = 1
-    
+visited = [[[float('inf')] * (can_break + 1) for _ in range(num_cols)] for _ in range(num_rows)]
+
+q = deque()
+q.append((0, 0, 0))
+visited[0][0][0] = 1
+
+
+def bfs():
     while q:
-        row, col, cnt = q.popleft()
-        
-        if row == num_row - 1 and col == num_col - 1:
-            return visited[row][col][cnt]
-        
+        row, col, num_breaks = q.popleft()
+        if row == num_rows - 1 and col == num_cols - 1:
+            return visited[row][col][num_breaks]
+
         for dr, dc in drdc:
             next_row = row + dr
             next_col = col + dc
-            
-            if not (0 <= next_row < num_row and 0 <= next_col < num_col):
-                continue
-            
-            if not visited[next_row][next_col][cnt]:
-                
-                if not board[next_row][next_col]:
-                    visited[next_row][next_col][cnt] = visited[row][col][cnt] + 1
-                    q.append((next_row, next_col, cnt))
-                
-                elif cnt < num_wall:
-                    visited[next_row][next_col][cnt + 1] = visited[row][col][cnt] + 1
-                    q.append((next_row, next_col, cnt + 1))
+
+            if 0 <= next_row < num_rows and 0 <= next_col < num_cols:
+                if board[next_row][next_col] == 0 and visited[row][col][num_breaks] + 1 < visited[next_row][next_col][num_breaks]:
+                    visited[next_row][next_col][num_breaks] = visited[row][col][num_breaks] + 1
+                    q.append((next_row, next_col, num_breaks))
+
+                if board[next_row][next_col] == 1 \
+                        and num_breaks + 1 <= can_break \
+                        and visited[row][col][num_breaks] + 1 < visited[next_row][next_col][num_breaks]:
+                    visited[next_row][next_col][num_breaks + 1] = visited[row][col][num_breaks] + 1
+                    q.append((next_row, next_col, num_breaks + 1))
     return -1
-                
-print(bfs(visited))
+
+print(bfs())
+

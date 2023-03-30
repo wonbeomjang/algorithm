@@ -1,99 +1,80 @@
 import sys
 from copy import deepcopy
 
+
 input = lambda: sys.stdin.readline().strip()
+drdc = ((-1, 0), (0, -1), (1, 0), (0, 1))
+num_rows, num_cols = map(int, input().split())
+answer = float('inf')
 
-num_row, num_col = map(int, input().split())
 
-board = [list(map(int, input().split())) for i in range(num_row)]
-
-drdc = ((-1, 0), (0, 1), (1, 0), (0, -1))
-
-NORTH = 0
-EAST  = 1
-SOUTH = 2
-WEST  = 3
-
-cctv = []
-cctv5 = []
-
-def move(row, col, board, direction):
-    dr, dc = drdc[direction]
-    
+def look(row, col, board, direction):
     while True:
-        row += dr
-        col += dc
-        if not (0 <= row < num_row and 0 <= col < num_col):
+        row, col = row + drdc[direction][0], col + drdc[direction][1]
+        if not (0 <= row < num_rows and 0 <= col < num_cols):
             break
-        
         if board[row][col] == 6:
-            return
-        
-        elif board[row][col] == 0:
+            break
+        if board[row][col] == 0:
             board[row][col] = 9
-            
-def look(row, col, board, cctv_type, direction):
-    if cctv_type == 1:
-        move(row, col, board, direction)
-        
-    elif cctv_type == 2:
-        move(row, col, board, direction)
-        move(row, col, board, (direction + 2) % 4)
-        
-    elif cctv_type == 3:
-        move(row, col, board, direction)
-        move(row, col, board, (direction + 3) % 4)
-        
-    elif cctv_type == 4:
-        move(row, col, board, direction)
-        move(row, col, board, (direction + 2) % 4)
-        move(row, col, board, (direction + 3) % 4)
-        
-    return board
 
-def print_board(board):
-    print()
-    for subline in board:
-        print(' '.join(map(str, subline)))
-
-for i in range(num_row):
-    for j in range(num_col):
-        if 0 < board[i][j] < 5:
-            cctv += [(i, j, board[i][j])]
-            
-        elif board[i][j] == 5:
-            move(i, j, board, NORTH)
-            move(i, j, board, EAST)
-            move(i, j, board, SOUTH)
-            move(i, j, board, WEST)
 
 def count_zero(board):
-    cnt = 0
-    
-    for i in range(num_row):
-        for j in range(num_col):
+    num_zeros = 0
+    for i in range(num_rows):
+        for j in range(num_cols):
             if board[i][j] == 0:
-                cnt += 1
-    
-    return cnt
+                num_zeros += 1
 
-ans = float('inf')
+    return num_zeros
 
-def dfs(board, cnt):
-    global cctv, ans
-    if cnt == len(cctv):
-        # print_board(board)
-        ans = min(ans, count_zero(board))
+
+def cctv(row, col, cctv_type, board, direction):
+    if cctv_type == 1:
+        look(row, col, board, direction)
+    elif cctv_type == 2:
+        look(row, col, board, direction)
+        look(row, col, board, (direction + 2) % 4)
+    elif cctv_type == 3:
+        look(row, col, board, direction)
+        look(row, col, board, (direction + 1) % 4)
+    elif cctv_type == 4:
+        look(row, col, board, direction)
+        look(row, col, board, (direction + 1) % 4)
+        look(row, col, board, (direction + 2) % 4)
+
+
+def dfs(board, n):
+    global answer
+
+    if n == len(cctv_info):
+        answer = min(answer, count_zero(board))
         return
-    
+
     for direction in range(4):
-        temp = deepcopy(board)
-        row, col, cctv_type = cctv[cnt]
-        look(row, col, temp, cctv_type, direction)
-        dfs(temp, cnt + 1)
-    
+        copyed_board = deepcopy(board)
+        row, col, cctv_type = cctv_info[n]
+        cctv(row, col, cctv_type, copyed_board, direction)
+        dfs(copyed_board, n + 1)
+
+
+def print_board(board):
+    for line in board:
+        print(" ".join(map(str, line)))
+
+
+cctv_info = []
+board = [list(map(int, input().split())) for i in range(num_rows)]
+
+for i in range(num_rows):
+    for j in range(num_cols):
+        if 0 < board[i][j] < 5:
+            cctv_info += [(i, j, board[i][j])]
+        if board[i][j] == 5:
+            look(i, j, board, 0)
+            look(i, j, board, 1)
+            look(i, j, board, 2)
+            look(i, j, board, 3)
 
 dfs(board, 0)
-
-print(ans)
-            
+print(answer)

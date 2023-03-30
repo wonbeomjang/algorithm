@@ -1,23 +1,7 @@
-N = int(input())
-
-expr = input()
-max_num = -(2 ** 31)
-
-def dfs(index, cur_val):
-    global expr
-    global max_num
-    
-    if index > N - 1:
-        max_num = max(max_num, cur_val)
-        return
-    
-    op = '+' if index == 0 else expr[index - 1]
-    
-    if index + 2 < N:
-        dfs(index + 4, eval(f'{cur_val}{op}({expr[index: index + 3]})'))
-    
-    dfs(index + 2, eval(f'{cur_val}{op}{expr[index]}'))
-   
-        
-dfs(0, 0)
-print(max_num)
+input()
+def d(v, e):
+    if not e:return v
+    a=-9**99
+    if len(e)>=4:a=d(eval(f"{v}{e[0]}({e[1:4]})"),e[4:])
+    return max(a,d(eval(f"{v}{e[0:2]}"),e[2:]))
+print(d(0,"+"+input()))

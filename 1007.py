@@ -1,51 +1,33 @@
-import math
-import sys
 from itertools import combinations
-input = sys.stdin.readline
+import sys
+
+input = lambda: sys.stdin.readline().strip()
+
+
+cnt = 0
 
 T = int(input())
-ans = float('inf')
 
+for i in range(T):
+    num_point = int(input())
+    point = [tuple(map(int, input().split())) for i in range(num_point)]
+    answer = float('inf')
 
+    for start_points in combinations(range(num_point), num_point // 2):
+        start_points = set(start_points)
 
-def dfs(cnt, index):
-    global ans
-    global N
-    global is_end
-    global points
-    
-    if cnt == N // 2:
-        x, y = 0, 0
-        
-        for i in range(N):
-            if is_end[i]:
-                x += points[i][0]
-                y += points[i][1]
+        x = 0
+        y = 0
+
+        for i in range(num_point):
+            if i in start_points:
+                x += point[i][0]
+                y += point[i][1]
             else:
-                x -= points[i][0]
-                y -= points[i][1]
-        
-        ans = min(ans, math.sqrt(x ** 2 + y ** 2))
-        return 
-        
-    if index >= N:
-        return
-    
-    dfs(cnt, index + 1)
-    is_end[index] = True
-    dfs(cnt + 1, index + 1)
-    is_end[index] = False
-          
+                x -= point[i][0]
+                y -= point[i][1]
 
-for _ in range(T):
-    N = int(input())
-    is_end = [False for i in range(N)]
-    points = []
-    ans = float('inf')
-    for _ in range(N):
-        start, end = map(int, input().split())
-        points += [[start, end]]
-    
-    dfs(0, 0)
-    
-    print(f'{ans:.12f}')
+        answer = min(answer, (x*x+y*y)**0.5)
+    print(answer)
+
+
